@@ -38,7 +38,7 @@ contract lottery{
 
         // maager approving the pool total to the winner
         function settle() public {
-            require(msg.sender == manager);
+            rnequire(msg.sender == manager);
             require(players.length >= 3);
 
             winner().transfer(getbalance()); 
