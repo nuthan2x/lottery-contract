@@ -19,9 +19,14 @@ contract lottery{
             players.push(payable(msg.sender));
         }
 
+        modifier onlyowner(){
+            require(msg.sender == manager,"You cant call this function, only owner can.");
+            _;
+        }
+
          
-        function getbalance() view public returns(uint){
-            require(msg.sender == manager);
+        function getbalance() view public onlyowner returns(uint){
+           
             return address(this).balance;
             
         }
@@ -48,8 +53,7 @@ contract lottery{
             
         }
         // maager approving the pool total to the winner
-        function settle() public {
-            require(msg.sender == manager);
+        function settle() public onlyowner {
             require(players.length >= 2);
             uint  fee = getbalance() * 10/100 ;  // 10% fee for contract caller
             payable(manager).transfer(fee);
