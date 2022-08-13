@@ -1,0 +1,48 @@
+//SPDX-License-Identifier: GPL-3.0
+
+pragma solidity ^0.8.7;
+
+contract lottery{
+
+        address public manager;
+        address payable[] public players;
+
+        constructor(){
+            manager = msg.sender;
+        }
+
+        // declaring the receive() function that is necessary to receive ETH
+        receive() external payable{
+            require(msg.value == 0.1 ether);
+            players.push(payable(msg.sender));
+        }
+
+         
+        function getbalance() view public returns(uint){
+            require(msg.sender == manager);
+            return address(this).balance;
+        }
+
+        // helper function that returns a big random integer (64 bytes)
+        function random() view public returns(uint){
+            return uint(keccak256(abi.encodePacked(block.difficulty,block.timestamp,players.length)));
+        }
+
+        // selecting the winner
+        function winner()  view public returns(address payable) {
+            uint r = random() % players.length ;
+            address payable lucky = players[r];
+
+            return lucky;
+        }
+
+        // maager approving the pool total to the winner
+        function settle() public {
+            require(msg.sender == manager);
+            require(players.length >= 3);
+
+            winner().transfer(getbalance()); 
+            players = new address payable[](0); 
+        }
+           
+}
